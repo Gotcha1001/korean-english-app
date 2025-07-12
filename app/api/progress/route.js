@@ -1,6 +1,7 @@
+// ./app/api/progress/route.js
 import { NextResponse } from "next/server";
-import { db } from "../../../configs/db"; // Updated to match your db import path
-import { UserProgress } from "../../../configs/schema";
+import { db } from "../../../configs/db";
+import { userProgress } from "../../../configs/schema"; // Corrected import (lowercase userProgress)
 import { auth } from "@clerk/nextjs/server";
 import { eq, and } from "drizzle-orm";
 
@@ -24,36 +25,40 @@ export async function POST(request) {
     // Check if progress already exists
     const existingProgress = await db
       .select()
-      .from(UserProgress)
+      .from(userProgress)
       .where(
         and(
-          eq(UserProgress.user_id, userId),
-          eq(UserProgress.lesson_id, lessonId)
+          eq(userProgress.userId, userId), // Corrected column name: user_id -> userId
+          eq(userProgress.lessonId, lessonId) // Corrected column name: lesson_id -> lessonId
         )
       );
 
     if (existingProgress.length > 0) {
       // Update existing progress
       await db
-        .update(UserProgress)
+        .update(userProgress)
         .set({
           completed,
-          last_attempted: new Date(), // Update timestamp for consistency
+          lastAttempted: new Date(),
         })
         .where(
           and(
-            eq(UserProgress.user_id, userId),
-            eq(UserProgress.lesson_id, lessonId)
+            eq(userProgress.userId, userId),
+            eq(userProgress.lessonId, lessonId)
           )
         );
+      console.log(`Updated progress for user ${userId}, lesson ${lessonId}`);
     } else {
       // Insert new progress
-      await db.insert(UserProgress).values({
-        user_id: userId,
-        lesson_id: lessonId,
+      await db.insert(userProgress).values({
+        userId, // Corrected column name: user_id -> userId
+        lessonId, // Corrected column name: lesson_id -> lessonId
         completed,
-        last_attempted: new Date(),
+        lastAttempted: new Date(),
       });
+      console.log(
+        `Inserted new progress for user ${userId}, lesson ${lessonId}`
+      );
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
