@@ -508,7 +508,7 @@ export default function LandingPage() {
                         ✨
                     </motion.div>
                 </div>
-// Landingpage.jsx (relevant section only)
+
                 <motion.p
                     className="text-xl mb-8 max-w-2xl text-purple-100 leading-relaxed"
                     variants={itemVariants}
